@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f9a8d4"/>
+      <stop offset="100%" style="stop-color:#c084fc"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="42" fill="url(#bg)"/>
+  <!-- Grid lines -->
+  <line x1="64" y1="20" x2="64" y2="172" stroke="white" stroke-width="4" stroke-opacity="0.4"/>
+  <line x1="128" y1="20" x2="128" y2="172" stroke="white" stroke-width="4" stroke-opacity="0.4"/>
+  <line x1="20" y1="64" x2="172" y2="64" stroke="white" stroke-width="4" stroke-opacity="0.4"/>
+  <line x1="20" y1="128" x2="172" y2="128" stroke="white" stroke-width="4" stroke-opacity="0.4"/>
+  <!-- Bear emoji in center -->
+  <text x="96" y="116" font-size="72" text-anchor="middle" dominant-baseline="middle">🐻</text>
+</svg>
