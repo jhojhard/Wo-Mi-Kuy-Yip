@@ -1,12 +1,13 @@
 {
-  "name": "@workspace/tres-en-raya",
-  "version": "0.0.0",
+  "name": "tres-en-raya",
+  "version": "1.0.0",
+  "description": "Juego de tres en raya con campaña, poderes especiales y torneos. PWA instalable.",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --config vite.config.ts --host 0.0.0.0",
-    "build": "vite build --config vite.config.ts",
-    "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
