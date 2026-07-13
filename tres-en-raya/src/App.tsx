@@ -12,7 +12,7 @@ import { reducer, initialState, computeAiMove, chooseBotPowerup, chooseBotTarget
   powerupTargets, getBoardStyles, getWinLen, getDropInterval, initBoard,
   getBossPrePlacedPositions } from './logic';
 import { SFX, setSoundEnabled, getSoundEnabled } from './sounds';
-import { CAMPAIGN_LEVELS, getLevelStars, type CampaignLevel } from './campaign';
+import { CAMPAIGN_LEVELS, getLevelStars, type CampaignLevel, type ExtraEnemy } from './campaign';
 
 // ── Confetti ───────────────────────────────────────────────────────────────────
 function Confetti({ active }: { active: boolean }) {
@@ -200,17 +200,21 @@ export default function App() {
         extraBlocked: campaignLevel.extraBlocked,
         prePlaced,
       });
+      const extraEnemies = campaignLevel.extraEnemies ?? [];
+      const numEnemies = 1 + extraEnemies.length;
       dispatch({
         type: 'INIT_GAME',
-        numPlayers: 2, size: campaignLevel.size,
-        playerKinds: ['human', 'bot'],
+        numPlayers: 1 + numEnemies, size: campaignLevel.size,
+        playerKinds: ['human', ...Array(numEnemies).fill('bot')] as PlayerKind[],
         aiDifficulty: campaignLevel.difficulty,
-        playerNames: [playerNames[0], campaignLevel.enemyName],
-        playerHues: [playerHues[0], 0],
+        playerNames: ['Osito', campaignLevel.enemyName, ...extraEnemies.map(e => e.name)],
+        playerHues: [playerHues[0], campaignLevel.enemyHue, ...extraEnemies.map(e => e.hue)],
         tournament: null,
-        campaign: { levelId: campaignLevel.id, bossLivesLeft: newLives, bossLivesTotal: campaignLevel.bossLives ?? 1 },
+        campaign: { levelId: campaignLevel.id, bossLivesLeft: newLives, bossLivesTotal: campaignLevel.bossLives ?? 1, startRewards: state.campaign.startRewards ?? [] },
         boardOverride: board,
-        startPowerups: [state.campaign.startRewards, campaignLevel.enemyStartPowerups ?? []],
+        startPowerups: ['human', ...Array(numEnemies).fill('bot')].map((_, i) =>
+          i === 0 ? (state.campaign?.startRewards ?? []) : (campaignLevel.enemyStartPowerups ?? [])
+        ),
       });
     } else {
       // Level complete — unlock next
@@ -223,7 +227,7 @@ export default function App() {
       setScreen('campaign');
       setCampaignLevel(null);
     }
-  }, [state.campaign, campaignLevel, playerNames, playerHues, unlockedLevel]);
+  }, [state.campaign, campaignLevel, playerHues, unlockedLevel]);
 
   // ── Tournament next-round handler ───────────────────────────────────────────
   const handleTournamentNextRound = useCallback(() => {
@@ -254,20 +258,29 @@ export default function App() {
       extraBlocked: level.extraBlocked,
       prePlaced,
     });
+    const extraEnemies = level.extraEnemies ?? [];
+    const numEnemies = 1 + extraEnemies.length;
+    const numPlayers = 1 + numEnemies;
+    const kinds: PlayerKind[] = ['human', ...Array(numEnemies).fill('bot')];
+    const names = ['Osito', level.enemyName, ...extraEnemies.map((e: ExtraEnemy) => e.name)];
+    const hues = [playerHues[0], level.enemyHue, ...extraEnemies.map((e: ExtraEnemy) => e.hue)];
+    const startPowerups = kinds.map((_, i) =>
+      i === 0 ? level.startReward : (level.enemyStartPowerups ?? [])
+    );
     dispatch({
       type: 'INIT_GAME',
-      numPlayers: 2, size: level.size,
-      playerKinds: ['human', 'bot'],
+      numPlayers, size: level.size,
+      playerKinds: kinds,
       aiDifficulty: level.difficulty,
-      playerNames: [playerNames[0], level.enemyName],
-      playerHues: [playerHues[0], level.id * 37 % 360],
+      playerNames: names,
+      playerHues: hues,
       tournament: null,
-      campaign: { levelId: level.id, bossLivesLeft: bossLives, bossLivesTotal: bossLives },
+      campaign: { levelId: level.id, bossLivesLeft: bossLives, bossLivesTotal: bossLives, startRewards: level.startReward },
       boardOverride: board,
-      startPowerups: [level.startReward, level.enemyStartPowerups ?? []],
+      startPowerups,
     });
     setScreen('playing');
-  }, [playerNames, playerHues]);
+  }, [playerHues]);
 
   // ── Start quick play ────────────────────────────────────────────────────────
   const startQuickPlay = useCallback(() => {
@@ -677,7 +690,9 @@ export default function App() {
         <div className="mx-auto mb-4 flex max-w-3xl flex-wrap justify-center gap-2">
           {state.players.map((p, i) => {
             const displayEmoji = campaignLevel
-              ? (i === 0 ? '🐻' : campaignLevel.enemyEmoji)
+              ? (i === 0 ? '🐻'
+                : i === 1 ? campaignLevel.enemyEmoji
+                : (campaignLevel.extraEnemies?.[i - 2]?.emoji ?? campaignLevel.enemyEmoji))
               : p.emoji;
             return (
             <div key={p.id}
@@ -763,7 +778,9 @@ export default function App() {
                   <>
                     <span className={boardStyle.emojiSize}>
                       {campaignLevel
-                        ? (cell.playerIndex === 0 ? '🐻' : campaignLevel.enemyEmoji)
+                        ? (cell.playerIndex === 0 ? '🐻'
+                          : cell.playerIndex === 1 ? campaignLevel.enemyEmoji
+                          : (campaignLevel.extraEnemies?.[cell.playerIndex - 2]?.emoji ?? campaignLevel.enemyEmoji))
                         : (PLAYERS_DEF[cell.playerIndex]?.emoji)}
                     </span>
                     {cell.shielded && <span className="absolute right-0 top-0 text-xs sm:text-sm">🛡️</span>}
