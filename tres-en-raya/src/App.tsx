@@ -501,6 +501,22 @@ export default function App() {
   // ══════════════════════════════════════════════════════════════════════════════
   // ── CAMPAIGN MAP ──────────────────────────────────────────────────────────────
   // ══════════════════════════════════════════════════════════════════════════════
+  // ── World themes for campaign map & board ─────────────────────────────────────
+  const WORLD_THEMES: Record<number, {
+    cardBg: string; cardBorder: string; boardBg: string; icon: string; textColor?: string;
+  }> = {
+    1:  { icon: '🌿', cardBg: 'linear-gradient(135deg,#bbf7d040,#86efac30)', cardBorder: '#16a34a', boardBg: 'linear-gradient(160deg,#dcfce7,#f0fdf4)', textColor: '#14532d' },
+    2:  { icon: '🌸', cardBg: 'linear-gradient(135deg,#fce7f340,#fbcfe830)', cardBorder: '#db2777', boardBg: 'linear-gradient(160deg,#fdf2f8,#fce7f3)', textColor: '#831843' },
+    3:  { icon: '🌲', cardBg: 'linear-gradient(135deg,#14532d40,#16653430)', cardBorder: '#15803d', boardBg: 'linear-gradient(160deg,#052e16,#064e3b)', textColor: '#86efac' },
+    4:  { icon: '⚔️', cardBg: 'linear-gradient(135deg,#fde68a40,#fbbf2430)', cardBorder: '#d97706', boardBg: 'linear-gradient(160deg,#451a03,#78350f)', textColor: '#fde68a' },
+    5:  { icon: '🏰', cardBg: 'linear-gradient(135deg,#e5e7eb40,#d1d5db30)', cardBorder: '#6b7280', boardBg: 'linear-gradient(160deg,#1f2937,#374151)', textColor: '#f3f4f6' },
+    6:  { icon: '🌊', cardBg: 'linear-gradient(135deg,#16653440,#05101030)', cardBorder: '#059669', boardBg: 'linear-gradient(160deg,#022c22,#064e3b)', textColor: '#6ee7b7' },
+    7:  { icon: '🏔️', cardBg: 'linear-gradient(135deg,#bfdbfe40,#e0f2fe30)', cardBorder: '#3b82f6', boardBg: 'linear-gradient(160deg,#eff6ff,#dbeafe)', textColor: '#1e3a8a' },
+    8:  { icon: '💀', cardBg: 'linear-gradient(135deg,#3b076440,#1e1b4b30)', cardBorder: '#7c3aed', boardBg: 'linear-gradient(160deg,#0c0014,#1e1b4b)', textColor: '#c4b5fd' },
+    9:  { icon: '🌋', cardBg: 'linear-gradient(135deg,#fca5a540,#f9731630)', cardBorder: '#dc2626', boardBg: 'linear-gradient(160deg,#450a0a,#7f1d1d)', textColor: '#fca5a5' },
+    10: { icon: '🔥', cardBg: 'linear-gradient(135deg,#7f1d1d50,#78350f40)', cardBorder: '#b91c1c', boardBg: 'linear-gradient(160deg,#1c0606,#450a0a)', textColor: '#fbbf24' },
+  };
+
   if (screen === 'campaign') return (
     <TooltipProvider>
       <div className="min-h-[100dvh] p-4">
@@ -508,32 +524,46 @@ export default function App() {
         <div className="mx-auto max-w-2xl">
           <button onClick={() => setScreen('menu')} className="mt-4 text-sm font-bold opacity-60 hover:opacity-100">← Menú</button>
           <h2 className="my-4 text-3xl font-black text-center">🗺️ Campaña</h2>
+          {/* Hero: player is a bear */}
+          <div className="mb-4 text-center text-sm text-muted-foreground">
+            🐻 <span className="font-bold">Tú eres el Osito</span> — ¡conquista todos los mundos!
+          </div>
           <div className="space-y-3">
             {CAMPAIGN_LEVELS.map(level => {
               const stars = getLevelStars(level.id, unlockedLevel);
               const locked = level.id > unlockedLevel;
+              const theme = WORLD_THEMES[level.id];
               return (
                 <motion.button key={level.id} disabled={locked}
                   onClick={() => startCampaignLevel(level)}
                   whileHover={locked ? {} : { scale: 1.02 }}
                   whileTap={locked ? {} : { scale: 0.98 }}
-                  className={`w-full rounded-2xl border-2 p-4 text-left transition ${locked ? 'border-border bg-muted/30 opacity-50 cursor-not-allowed' : level.isBoss ? 'border-destructive bg-destructive/10 shadow-lg' : 'border-border bg-card hover:bg-muted/40 shadow'}`}>
+                  className={`w-full rounded-2xl border-2 p-4 text-left transition shadow ${locked ? 'border-border bg-muted/30 opacity-50 cursor-not-allowed' : 'hover:opacity-95'}`}
+                  style={locked ? {} : {
+                    background: theme.cardBg,
+                    borderColor: level.isBoss ? '#dc2626' : theme.cardBorder,
+                    boxShadow: level.isBoss ? `0 4px 24px ${theme.cardBorder}55` : `0 2px 12px ${theme.cardBorder}33`,
+                  }}>
                   <div className="flex items-center gap-3">
-                    <span className="text-3xl">{locked ? '🔒' : level.enemyEmoji}</span>
+                    {/* World avatar: enemy on left, bear vs enemy */}
+                    <div className="relative flex shrink-0 flex-col items-center">
+                      <span className="text-3xl leading-none">{locked ? '🔒' : level.enemyEmoji}</span>
+                      {!locked && <span className="text-base leading-none">🐻⚔️</span>}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-black text-sm">{level.id}. {level.name}</span>
-                        {level.isBoss && <span className="rounded-full bg-destructive px-2 py-0.5 text-xs font-bold text-destructive-foreground">JEFE</span>}
+                        {level.isBoss && <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">JEFE</span>}
                       </div>
-                      <div className="text-xs text-muted-foreground truncate">{level.worldName} · {level.description}</div>
+                      <div className="text-xs opacity-70 truncate font-medium">{level.worldName} · {level.description}</div>
                     </div>
                     <div className="text-lg shrink-0">{Array.from({ length: 3 }, (_, i) => i < stars ? '⭐' : '☆').join('')}</div>
                   </div>
                   {!locked && (
-                    <div className="mt-2 text-xs text-muted-foreground italic">"{level.story}"</div>
+                    <div className="mt-2 text-xs opacity-60 italic">"{level.story}"</div>
                   )}
                   {!locked && (
-                    <div className="mt-1 flex gap-2 text-xs">
+                    <div className="mt-1 flex gap-2 text-xs font-medium opacity-70">
                       <span>{level.size}×{level.size}</span>
                       <span>{DIFFICULTY_INFO[level.difficulty].label}</span>
                       {level.withBonus && <span>⭐ Bonus</span>}
@@ -546,7 +576,7 @@ export default function App() {
             })}
           </div>
           <div className="mt-4 text-center text-xs text-muted-foreground">
-            Personaliza tu personaje en Partida Rápida
+            🐻 En campaña siempre juegas como el Osito Héroe
           </div>
         </div>
       </div>
@@ -595,7 +625,13 @@ export default function App() {
         .earth-shake { animation: earthShake 0.8s ease; }
       `}</style>
 
-      <div className="min-h-[100dvh] px-3 pb-8 pt-14 sm:px-4">
+      {/* Campaign themed background overlay */}
+      {campaignLevel && WORLD_THEMES[campaignLevel.id] && (
+        <div className="pointer-events-none fixed inset-0 z-0"
+          style={{ background: WORLD_THEMES[campaignLevel.id].boardBg, opacity: 0.18 }} />
+      )}
+
+      <div className="relative z-10 min-h-[100dvh] px-3 pb-8 pt-14 sm:px-4">
         {/* Top bar */}
         <div className="fixed left-3 top-3 z-50 flex gap-2">
           <button onClick={() => { SFX.click(); setScreen('menu'); dispatch({ type: 'CANCEL_POWERUP' }); }}
@@ -639,11 +675,15 @@ export default function App() {
 
         {/* Players */}
         <div className="mx-auto mb-4 flex max-w-3xl flex-wrap justify-center gap-2">
-          {state.players.map((p, i) => (
+          {state.players.map((p, i) => {
+            const displayEmoji = campaignLevel
+              ? (i === 0 ? '🐻' : campaignLevel.enemyEmoji)
+              : p.emoji;
+            return (
             <div key={p.id}
               className={`relative min-w-[95px] rounded-xl border-2 p-2 text-center transition ${i === state.currentPlayer ? 'scale-105 border-primary shadow-lg' : 'border-border bg-card opacity-75'}`}
               style={i === state.currentPlayer ? { backgroundColor: `hsl(${p.hue},70%,96%)`, borderColor: `hsl(${p.hue},70%,60%)` } : {}}>
-              <div className="text-2xl">{p.emoji}</div>
+              <div className="text-2xl">{displayEmoji}</div>
               <div className="text-sm font-bold truncate max-w-[90px]">{p.name}{p.kind === 'bot' ? ' 🤖' : ''}</div>
               <div className="text-xs">Pts: {p.score}</div>
               {p.extraTurns > 0 && <div className="text-xs text-primary font-bold">⚡+1</div>}
@@ -669,7 +709,8 @@ export default function App() {
                 </span>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Status bar */}
@@ -720,7 +761,11 @@ export default function App() {
                 {cell.type === 'teleport' && <span className={boardStyle.emojiSize}>🌀</span>}
                 {cell.type === 'player' && cell.playerIndex !== undefined && (
                   <>
-                    <span className={boardStyle.emojiSize}>{PLAYERS_DEF[cell.playerIndex]?.emoji}</span>
+                    <span className={boardStyle.emojiSize}>
+                      {campaignLevel
+                        ? (cell.playerIndex === 0 ? '🐻' : campaignLevel.enemyEmoji)
+                        : (PLAYERS_DEF[cell.playerIndex]?.emoji)}
+                    </span>
                     {cell.shielded && <span className="absolute right-0 top-0 text-xs sm:text-sm">🛡️</span>}
                   </>
                 )}

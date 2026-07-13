@@ -55,8 +55,8 @@ export const CAMPAIGN_LEVELS: CampaignLevel[] = [
   {
     id: 5, name: '¡Mini-Jefe! El Guardián', worldName: '🏰 La Fortaleza',
     description: 'Tienes que vencerlo 2 veces para pasar.',
-    story: '¡El Oso Guardián protege la fortaleza! Con cada derrota, regresa más furioso.',
-    enemyEmoji: '🐻', enemyName: 'Oso Guardián',
+    story: '¡El León Guardián protege la fortaleza! Con cada derrota, regresa más furioso.',
+    enemyEmoji: '🦁', enemyName: 'León Guardián',
     size: 5, difficulty: 'dificil', isBoss: true, bossLives: 2,
     withBonus: true, startReward: ['Intercambio'],
     enemyStartPowerups: ['Escudo', 'Bomba'],
