@@ -4,3 +4,27 @@ expertMode = true
 
 [nix]
 channel = "stable-25_05"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Tres en Raya"
+
+[[workflows.workflow]]
+name = "Tres en Raya"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd tres-en-raya && pnpm install && pnpm dev"
+
+[[ports]]
+localPort = 5000
+externalPort = 5000
